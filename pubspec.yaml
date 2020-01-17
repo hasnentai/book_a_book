@@ -21,6 +21,7 @@ dependencies:
   cupertino_icons: ^0.1.2
   provider: ^3.0.0+1
   
+  
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -38,4 +39,8 @@ flutter:
   assets:
     - res/images/loginbg.png
     - res/images/placeholder.png
+    - res/images/visa.png
+    - res/images/group.jfif
+    - res/images/allbooks.jfif
+    - res/images/chair.jfif
 

@@ -10,13 +10,17 @@ import 'package:book_a_book/modal/productmodel.dart';
 import 'package:book_a_book/screens/category.dart';
 import 'package:book_a_book/screens/productdetail.dart';
 import 'package:book_a_book/service/categoryservice.dart';
+import 'package:book_a_book/util/cartbloc.dart';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:html/parser.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
+
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -25,7 +29,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   Future<List<Category>> cats;
-  List<Widget> bookShimmer = new List();
+  List<Widget> bookShimmer = List();
   ScrollController _scrollController = ScrollController();
   int currentPage = 1;
   bool isCatLoading = true;
@@ -38,9 +42,16 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   Animation<double> opacityAnimation;
   Animation slideAnimation;
   bool visible = false;
+  int totalCartItems=0;
+  List cartItems=[];
+  List bannerImage = ['res/images/group.jfif','res/images/allbooks.jfif',
+    'res/images/chair.jfif'];
 
   @override
   void initState() {
+
+    checkCart();
+
     for (int i = 0; i <= 9; i++) {
       bookShimmer.add(shimmerMaker());
     }
@@ -75,6 +86,19 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     ));
   }
 
+
+  void checkCart() async {
+    print("called");
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      if (prefs.getKeys().length > 0) {
+        totalCartItems = prefs.getStringList('cart').length.toInt();
+        cartItems = prefs.getStringList('cart');
+      }
+    });
+  }
+
+
   Widget headerbuilder(BuildContext context) {
     // var height = MediaQuery.of(context).size.height;
 
@@ -83,13 +107,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       builder: (BuildContext context, Widget child) {
         return Transform.translate(
           offset: Offset(0.0, animation.value),
-          child: new Container(
+          child: Container(
             height: MediaQuery.of(context).size.height / 2.3,
             width: MediaQuery.of(context).size.width,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                new Stack(
+                Stack(
                   children: <Widget>[
                     Positioned(
                         right: 10.0,
@@ -100,9 +124,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                             },
                             child: GestureDetector(
                               onTap: () {
-                               animationStop();
+                                animationStop();
                               },
-                              child: new Icon(
+                              child: Icon(
                                 Icons.close,
                                 size: 30.0,
                                 color: Colors.white,
@@ -114,7 +138,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         transform: Matrix4.rotationZ(0.2),
                         child: Opacity(
                           opacity: 0.6,
-                          child: new Icon(
+                          child: Icon(
                             Icons.class_,
                             size: 40.0,
                             color: Colors.white,
@@ -129,7 +153,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         transform: Matrix4.rotationZ(0.5),
                         child: Opacity(
                           opacity: 0.7,
-                          child: new Icon(
+                          child: Icon(
                             Icons.class_,
                             size: 60.0,
                             color: Colors.white,
@@ -144,7 +168,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         transform: Matrix4.rotationZ(2.0),
                         child: Opacity(
                           opacity: 0.4,
-                          child: new Icon(
+                          child: Icon(
                             Icons.class_,
                             size: 40.0,
                             color: Colors.white,
@@ -159,7 +183,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         transform: Matrix4.rotationZ(3.0),
                         child: Opacity(
                           opacity: 0.6,
-                          child: new Icon(
+                          child: Icon(
                             Icons.class_,
                             size: 40.0,
                             color: Colors.white,
@@ -170,7 +194,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     Center(
                       child: Hero(
                         tag: 'icon',
-                        child: new Icon(
+                        child: Icon(
                           Icons.class_,
                           size: 200.0,
                           color: Colors.white,
@@ -179,12 +203,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     ),
                   ],
                 ),
-                new Row(
+                Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    new Text(
+                    Text(
                       'Book a Book',
-                      style: new TextStyle(
+                      style: TextStyle(
                           fontSize: 24.0,
                           color: Colors.white,
                           fontWeight: FontWeight.w600),
@@ -193,7 +217,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 )
               ],
             ),
-            decoration: new BoxDecoration(
+            decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
@@ -204,15 +228,15 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 BoxShadow(
                   color: Colors.black12,
                   blurRadius: 6.0, // has the effect of softening the shadow
-                 
+
                   offset: Offset(
                     0, // horizontal, move right 10
                     3.0, // vertical, move down 10
                   ),
                 )
               ],
-              borderRadius: new BorderRadius.vertical(
-                  bottom: new Radius.elliptical(
+              borderRadius: BorderRadius.vertical(
+                  bottom: Radius.elliptical(
                       MediaQuery.of(context).size.width, 100.0)),
             ),
           ),
@@ -224,10 +248,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   List<ProductModel> products;
   List<ProductModel> productsList;
   Future<void> getAllProducts(int currentPage) async {
-    var client = new http.Client();
+    var client = http.Client();
     try {
       var response = await client.get(
-          'http://bookabook.co.za/wp-json/wc/v3/products?consumer_key=ck_34efa34549443c3706b49f8525947961737748e5&consumer_secret=cs_5a3a24bff0ed2e8c66c8d685cb73680090a44f75&order=asc&filter[meta_key]=total_sales&per_page=10&page=$currentPage&status=publish');
+          'https://easyaccountz.com/wp/wp-json/wc/v3/products?consumer_key=ck_bfa93e17af86e89b53ce162b1403b9ac49ca039d&consumer_secret=cs_14b596e385f7390dc649cc067effe489ed456647&order=asc&filter[meta_key]=total_sales&per_page=10&page=$currentPage&status=publish');
       if (response.statusCode == 200) {
         var data = json.decode(response.body);
         var list = data as List;
@@ -264,19 +288,24 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   Widget customSlider(BuildContext context) {
-    return new Swiper(
+    return Swiper(
+      
       itemBuilder: (BuildContext context, int index) {
         return Padding(
           padding: const EdgeInsets.all(8.0),
-          child: new Container(
+          child: Container(
             height: 200.0,
-            decoration: new BoxDecoration(
+            decoration: BoxDecoration(
                 color: Colors.indigo,
-                borderRadius: new BorderRadius.circular(20.0)),
+                image: DecorationImage(
+                  fit: BoxFit.cover,
+                  image: AssetImage(bannerImage[index])
+                ),
+                borderRadius: BorderRadius.circular(20.0)),
           ),
         );
       },
-      itemCount: 3,
+      itemCount: bannerImage.length,
       viewportFraction: 0.8,
       autoplay: true,
     );
@@ -296,11 +325,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               padding: const EdgeInsets.all(8.0),
               child: Stack(
                 children: <Widget>[
-                  new Container(
+                  Container(
                     width: 130.0,
-                    decoration: new BoxDecoration(
+                    decoration: BoxDecoration(
                       color: Colors.black,
-                      borderRadius: new BorderRadius.circular(15.0),
+                      borderRadius: BorderRadius.circular(15.0),
                     ),
                   ),
                 ],
@@ -348,10 +377,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   Container(height: 200.0, child: customSlider(context)),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: new Row(
+                    child: Row(
                       children: <Widget>[
                         Expanded(
-                          child: new Text(
+                          child: Text(
                             'Browse By Categories',
                             style: TextStyle(
                                 fontSize: (deviceHeight / 100) + 10,
@@ -362,11 +391,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         Padding(
                           padding: const EdgeInsets.symmetric(vertical: 8.0),
                           child: Container(
-                              decoration: new BoxDecoration(
+                              decoration: BoxDecoration(
                                   color: Colors.white,
-                                  borderRadius: new BorderRadius.circular(50.0),
-                                  border:
-                                      new Border.all(color: Color(0xFFFF900F))),
+                                  borderRadius: BorderRadius.circular(50.0),
+                                  border: Border.all(color: Color(0xFFFF900F))),
                               child: Padding(
                                 padding: const EdgeInsets.all(3.0),
                                 child: Icon(Icons.arrow_forward_ios,
@@ -380,9 +408,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     future: cats,
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
-                        return new Container(
+                        return Container(
                           height: (deviceHeight + 370) * 0.1,
-                          child: new ListView.builder(
+                          child: ListView.builder(
                             scrollDirection: Axis.horizontal,
                             itemCount: snapshot.data.length,
                             itemExtent: (deviceHeight + 190) * 0.1,
@@ -395,10 +423,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                     child: GestureDetector(
                                       child: Hero(
                                         child: Container(
-                                          decoration: new BoxDecoration(
+                                          decoration: BoxDecoration(
                                               borderRadius:
                                                   BorderRadius.circular(90.0),
-                                              border: new Border.all(
+                                              border: Border.all(
                                                   color: Colors.white),
                                               color: Colors.transparent),
                                           height: deviceHeight * 0.1,
@@ -478,17 +506,15 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                             Padding(
                                               padding: const EdgeInsets.only(
                                                   left: 4.0, right: 4.0),
-                                              child: new Container(
+                                              child: Container(
                                                   height: deviceHeight * 0.1,
                                                   width: deviceHeight * 0.1,
-                                                  decoration: new BoxDecoration(
+                                                  decoration: BoxDecoration(
                                                     color: Colors.black26,
-                                                    boxShadow: [
-                                                      new BoxShadow()
-                                                    ],
+                                                    boxShadow: [BoxShadow()],
                                                     borderRadius:
-                                                        new BorderRadius
-                                                            .circular(90.0),
+                                                        BorderRadius.circular(
+                                                            90.0),
                                                   )),
                                             ),
                                             Padding(
@@ -497,7 +523,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                               child: Container(
                                                 height: 10,
                                                 width: 90.0,
-                                                decoration: new BoxDecoration(
+                                                decoration: BoxDecoration(
                                                   color: Colors.white,
                                                 ),
                                               ),
@@ -513,10 +539,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   ),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: new Row(
+                    child: Row(
                       children: <Widget>[
                         Expanded(
-                          child: new Text(
+                          child: Text(
                             'Listing Popular Rentals',
                             style: TextStyle(
                                 fontSize: (deviceHeight / 100) + 10,
@@ -527,11 +553,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         Padding(
                           padding: const EdgeInsets.fromLTRB(8.0, 0, 8.0, 8.0),
                           child: Container(
-                              decoration: new BoxDecoration(
+                              decoration: BoxDecoration(
                                   color: Colors.white,
-                                  borderRadius: new BorderRadius.circular(50.0),
-                                  border:
-                                      new Border.all(color: Color(0xFFFF900F))),
+                                  borderRadius: BorderRadius.circular(50.0),
+                                  border: Border.all(color: Color(0xFFFF900F))),
                               child: Padding(
                                 padding: const EdgeInsets.all(3.0),
                                 child: Icon(Icons.arrow_forward_ios,
@@ -582,7 +607,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                             bookImage: item.images[0].src,
                                             priceHtml: item.priceHtml)));
                               },
-                              child: new Column(
+                              child: Column(
                                 children: <Widget>[
                                   Stack(
                                     children: <Widget>[
@@ -591,14 +616,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                         child: Padding(
                                           padding: const EdgeInsets.all(8.0),
                                           child: Hero(
-                                            tag: item.name,
+                                            tag: item.id,
                                             child: Stack(
                                               children: <Widget>[
                                                 Container(
                                                   height:
                                                       (deviceHeight / 10) + 100,
                                                   child: ClipRRect(
-                                                    child: new FadeInImage
+                                                    child: FadeInImage
                                                         .assetNetwork(
                                                       placeholder:
                                                           'res/images/placeholder.png',
@@ -612,39 +637,39 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                                         BorderRadius.circular(
                                                             10.0),
                                                   ),
-                                                  decoration: new BoxDecoration(
+                                                  decoration: BoxDecoration(
                                                     color: Colors.white,
                                                     boxShadow: [
-                                                      new BoxShadow(
+                                                      BoxShadow(
                                                         color: Colors.black45,
-                                                        offset: new Offset(
-                                                            1.0, 1.0),
+                                                        offset:
+                                                            Offset(1.0, 1.0),
                                                         blurRadius: 4.0,
                                                       )
                                                     ],
                                                     borderRadius:
-                                                        new BorderRadius
-                                                            .circular(15.0),
+                                                        BorderRadius.circular(
+                                                            15.0),
                                                   ),
                                                 )
-                                                /*new Container(
+                                                /*  Container(
                                                   width: (deviceHeight / 10) + 70,
-                                                  decoration: new BoxDecoration(
+                                                  decoration:   BoxDecoration(
                                                       color: Colors.black26,
                                                       boxShadow: [
-                                                        new BoxShadow(
+                                                          BoxShadow(
                                                           color: Colors.black45,
                                                           offset:
-                                                              new Offset(1.0, 1.0),
+                                                                Offset(1.0, 1.0),
                                                           blurRadius: 4.0,
                                                         )
                                                       ],
                                                       borderRadius:
-                                                          new BorderRadius.circular(
+                                                            BorderRadius.circular(
                                                               15.0),
-                                                      image: new DecorationImage(
+                                                      image:   DecorationImage(
                                                           fit: BoxFit.cover,
-                                                          image: new NetworkImage(
+                                                          image:   NetworkImage(
                                                               item.images[0].src))),
                                                 ),*/
                                               ],
@@ -658,12 +683,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                     padding: const EdgeInsets.symmetric(
                                         horizontal: 10.0),
                                     child: Container(
-                                        child: new Text(
+                                        child: Text(
                                       item.name,
                                       maxLines: 1,
                                       softWrap: false,
                                       overflow: TextOverflow.ellipsis,
-                                      style: new TextStyle(
+                                      style: TextStyle(
                                           fontWeight: FontWeight.w400,
                                           fontSize: 16.0),
                                     )),
@@ -673,12 +698,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                         horizontal: 10.0),
                                     child: Container(
                                         width: 140.0,
-                                        child: new Text(
+                                        child: Text(
                                           item.priceHtml,
                                           maxLines: 1,
                                           softWrap: false,
                                           overflow: TextOverflow.ellipsis,
-                                          style: new TextStyle(
+                                          style: TextStyle(
                                               color: Colors.black87,
                                               fontWeight: FontWeight.bold,
                                               fontSize: 13.0,
@@ -706,7 +731,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                           children: <Widget>[
                             Padding(
                               padding: const EdgeInsets.all(18.0),
-                              child: new Text('No More Books To Display'),
+                              child: Text('No More Books To Display'),
                             )
                           ],
                         )
@@ -714,7 +739,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               )
             ],
           ),
-         
           headerbuilder(context),
         ],
       ),
@@ -722,10 +746,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   animationStart() {
-  
     controller.forward();
-    
-   
   }
 
   animationStop() {
@@ -734,7 +755,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    return new MaterialApp(
+    var bloc = Provider.of<CartBloc>(context);
+    int totalCount = 0;
+    if (bloc.cart.length > 0) {
+      totalCount = bloc.cart.values.reduce((a, b) => a + b);
+    }
+    return   MaterialApp(
       theme: ThemeData(
         primarySwatch: Colors.orange,
         fontFamily: 'Raleway',
@@ -745,53 +771,63 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         primaryIconTheme: IconThemeData(color: Colors.white),
       ),
       debugShowCheckedModeBanner: false,
-      home: new Scaffold(
-        appBar: new AppBar(
-          title: new Text(
+      home: Scaffold(
+        appBar: AppBar(
+          title: Text(
             'Book A Book',
           ),
           leading: GestureDetector(
-              child: new Icon(Icons.dashboard),
+              child: Icon(Icons.dashboard),
               onTap: () {
                 animationStart();
               }),
           actions: <Widget>[
             Padding(
               padding: const EdgeInsets.only(left: 4.0, right: 18.0),
-              child: new Stack(
-                alignment: Alignment.center,
-                children: <Widget>[
-                  new Icon(Icons.shopping_cart),
-                  new Positioned(
-                    right: 0,
-                    top: 6,
-                    child: new Container(
-                      padding: EdgeInsets.all(1),
-                      decoration: new BoxDecoration(
-                        color: Colors.red,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      constraints: BoxConstraints(
-                        minWidth: 18,
-                        minHeight: 18,
-                      ),
-                      child: new Text(
-                        '1',
-                        style: new TextStyle(
-                          color: Colors.white,
-                          fontSize: 12,
+              child: Material(
+                color: Colors.transparent,
+
+                              child: InkWell(
+                                onTap: (){
+                                  Navigator.pushNamed(context, "/cart");
+                                },
+                                child: Stack(
+                          alignment: Alignment.center,
+                  children: <Widget>[
+                    Icon(Icons.shopping_cart),
+                   totalCount>0? Positioned(
+                      right: 0,
+                      top: 6,
+                      child: Container(
+                        padding: EdgeInsets.all(1),
+                        decoration: BoxDecoration(
+                          color: Colors.red,
+                          borderRadius: BorderRadius.circular(10),
                         ),
-                        textAlign: TextAlign.center,
+                        constraints: BoxConstraints(
+                          minWidth: 18,
+                          minHeight: 18,
+                        ),
+                        child:  Text(
+                          '$totalCount',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
                       ),
-                    ),
-                  )
-                ],
+                    ):Container()
+                  ],
+                ),
+                              ),
               ),
             ),
           ],
         ),
         body: homeBuild(context),
-      ),
-    );
+      ), 
+      );
+
   }
 }

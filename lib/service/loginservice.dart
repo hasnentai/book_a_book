@@ -11,7 +11,7 @@ class LoginService {
     int code;
     try {
       var response = await client.post(
-          'https://bookabook.co.za/wp-json/jwt-auth/v1/token?username=$userId&password=$password');
+          'https://easyaccountz.com/wp/wp-json/jwt-auth/v1/token?username=$userId&password=$password');
       code = response.statusCode;
       if (response.statusCode == 200) {
         var data = json.decode(response.body);

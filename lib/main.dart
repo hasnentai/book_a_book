@@ -1,11 +1,15 @@
 import 'dart:io';
 
+import 'package:book_a_book/screens/cart.dart';
 import 'package:book_a_book/screens/category.dart';
 import 'package:book_a_book/screens/home.dart';
 import 'package:book_a_book/screens/index.dart';
 import 'package:book_a_book/screens/login.dart';
+import 'package:book_a_book/screens/order_placed.dart';
+import 'package:book_a_book/util/cartbloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class MyHttpOverrides extends HttpOverrides {
@@ -24,7 +28,9 @@ class MyApp extends StatelessWidget {
   var routes = <String, WidgetBuilder>{
     "/login": (BuildContext context) => LoginScreen(),
     "/home": (BuildContext context) => HomeScreen(),
-    "/category": (BuildContext context) => CategoryScreen()
+    "/category": (BuildContext context) => CategoryScreen(),
+    "/cart":(BuildContext context)=>MyCart(),
+    "/order_placed":(BuildContext context)=>OrderPlaced()
   };
   String initialRoute = "/login";
   @override
@@ -35,7 +41,9 @@ class MyApp extends StatelessWidget {
       systemNavigationBarColor: Color(0xFFFF900F), //bottom bar color
       systemNavigationBarIconBrightness: Brightness.light, //bottom bar icons
     ));
-    return MaterialApp(
+    return ChangeNotifierProvider<CartBloc>(
+        builder: (context) => CartBloc(),
+        child: MaterialApp(
       theme: ThemeData(
         primarySwatch: Colors.orange,
         fontFamily: 'Raleway',
@@ -44,7 +52,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       initialRoute: '/',
       routes: routes,
-    );
+    ));
   }
 }
 

@@ -113,15 +113,15 @@ class _CategoryState extends State<CategoryScreen> {
                   delegate: SliverChildBuilderDelegate(
                 (context, i) {
                   print(snapshot.data[i].averageRating);
-                  if (double.parse(snapshot.data[i].averageRating) > 3.00) {
-                    ratingColor = Colors.green;
-                  } else if (double.parse(snapshot.data[i].averageRating) > 2.00) {
-                    ratingColor = Colors.orangeAccent;
-                  } else if (double.parse(snapshot.data[i].avarageRating) > 1.00) {
-                    ratingColor = Colors.redAccent;
-                  } else if (double.parse(snapshot.data[i].avarageRating) == 0.00){
-                    ratingColor = Colors.red;
-                  }
+                  // if (double.parse(snapshot.data[i].averageRating) > 3.00) {
+                  //   ratingColor = Colors.green;
+                  // } else if (double.parse(snapshot.data[i].averageRating) > 2.00) {
+                  //   ratingColor = Colors.orangeAccent;
+                  // } else if (double.parse(snapshot.data[i].avarageRating) > 1.00) {
+                  //   ratingColor = Colors.redAccent;
+                  // } else if (double.parse(snapshot.data[i].avarageRating) == 0.00){
+                  //   ratingColor = Colors.red;
+                  // }
                   return Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Row(
@@ -214,15 +214,17 @@ class _CategoryState extends State<CategoryScreen> {
                                   child: Container(
                                     decoration: new BoxDecoration(
                                       borderRadius: BorderRadius.circular(2.0),
-                                     
                                     ),
                                     child: Padding(
                                       padding: const EdgeInsets.symmetric(
                                           vertical: 4.0, horizontal: 10.0),
                                       child: Text(
+                                         snapshot.data[i].averageRating
+                                            .toString()
+                                            .trim()=="0.0"?
                                         snapshot.data[i].averageRating
                                             .toString()
-                                            .trim(),
+                                            .trim():"No Ratings",
                                         maxLines: 1,
                                         softWrap: false,
                                         overflow: TextOverflow.ellipsis,

@@ -38,10 +38,11 @@ class _LoginScreenState extends State<LoginScreen> {
       //response = await controller.login(_email, _password);
       code = await LoginService().loginUser(_email, _password);
 
-      if (code == 200) {
-        setState(() => _isLoading = false);
-        Navigator.pushNamed(context, "/home");
-      }
+       if (code == 200) {
+         setState(() => _isLoading = false);
+         Navigator.pushNamed(context, "/home");
+       }
+       //Navigator.pushNamed(context, "/home");
     } catch (e) {
       print(e);
     }
@@ -90,7 +91,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Widget emailField() {
     return new TextFormField(
-      initialValue: 'hasnen712',
+      initialValue: 'admin',
       decoration: InputDecoration(
         border: OutlineInputBorder(),
         labelText: 'Email',
@@ -103,7 +104,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Widget passwordField() {
     return TextFormField(
-        initialValue: 'hasnenvkfan712',
+        initialValue: 'admin',
         obscureText: true,
         decoration: InputDecoration(
           border: OutlineInputBorder(),

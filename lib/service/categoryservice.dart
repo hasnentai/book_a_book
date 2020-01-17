@@ -16,7 +16,7 @@ class CategoryService {
     print("hello");
     try {
       response = await client.get(
-          'http://bookabook.co.za/wp-json/wc/v3/products/categories?consumer_key=ck_34efa34549443c3706b49f8525947961737748e5&consumer_secret=cs_5a3a24bff0ed2e8c66c8d685cb73680090a44f75&order=desc&orderby=count');
+          'https://easyaccountz.com/wp/wp-json/wc/v3/products/categories?consumer_key=ck_bfa93e17af86e89b53ce162b1403b9ac49ca039d&consumer_secret=cs_14b596e385f7390dc649cc067effe489ed456647&order=desc');
       print(response.body);
 
       if (response.statusCode == 200) {
@@ -40,7 +40,7 @@ class CategoryService {
     print("hello");
     try {
       response = await client.get(
-          'https://bookabook.co.za/wp-json/wc/v3/products?consumer_key=ck_34efa34549443c3706b49f8525947961737748e5&consumer_secret=cs_5a3a24bff0ed2e8c66c8d685cb73680090a44f75&page=$currentPage&per_page=10&category=$id&order=asc&filter[meta_key]=total_sales&status=publish');
+          'https://easyaccountz.com/wp/wp-json/wc/v3/products?consumer_key=ck_bfa93e17af86e89b53ce162b1403b9ac49ca039d&consumer_secret=cs_14b596e385f7390dc649cc067effe489ed456647&page=$currentPage&per_page=10&category=$id&order=asc&filter[meta_key]=total_sales&status=publish');
       print(response.body);
 
       if (response.statusCode == 200) {
