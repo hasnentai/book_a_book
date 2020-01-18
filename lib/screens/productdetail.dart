@@ -227,7 +227,7 @@ class _DetailPageState extends State<DetailPage> with TickerProviderStateMixin {
   void checkCart() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
-      if (prefs.getKeys().length > 0) {
+      if (prefs.containsKey('cart')) {
         totalCartItems = prefs.getStringList('cart').length.toInt();
       }
       if (prefs.containsKey('cart')) {

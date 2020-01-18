@@ -91,7 +91,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     print("called");
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
-      if (prefs.getKeys().length > 0) {
+      if (prefs.containsKey('cart')) {
         totalCartItems = prefs.getStringList('cart').length.toInt();
         cartItems = prefs.getStringList('cart');
       }
